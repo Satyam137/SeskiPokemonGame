@@ -1,0 +1,142 @@
+import pygame
+import random
+import os
+class Pokemon:
+    def __init__(self,type,name,level,moves,hp,atk,dfc):
+        self.name=name
+        self.type=type
+        self.health=10*level
+        self.moves=[]
+        self.hp=hp
+        self.atk=atk
+        self.dfc=dfc
+    def damageCalculator(self, enemy, move):
+        final_damage = ((((2 * self.level) // 5) + 2) * move.bp * (self.atk // enemy.dfc)) // 35
+        criticalhitChance = random.randint(0, 9)
+        if criticalhitChance == 0:
+            final_damage = final_damage * 1.5
+        return final_damage
+class Charmander(Pokemon):
+    def __init__(self, level):
+        super().__init__(name='Charmander', type='Fire', moves=[Tackle,Growl,Ember], level=level, atk=54, dfc= 35, hp = 40)
+
+class Bulbasaur(Pokemon):
+    def __init__(self, level):
+        super().__init__(name='Bulbasaur', type='Grass', moves=[Tackle,Growl,bulletseed], level=level,atk=42, dfc= 40, hp = 64)
+
+class Squirtle(Pokemon):
+    def __init__(self, level):
+        super().__init__(name='Squirtle', type='Water', moves =[watergun,Tailwhip], level=level,atk=32, dfc= 55, hp = 50)
+
+class Pikachu(Pokemon):
+    def __init__(self, level):
+        super().__init__(name='Pikachu', type='Electric', moves =[spark,Tailwhip], level=level,atk=60, dfc= 35, hp = 34)
+
+class Eevee(Pokemon):
+    def __init__(self, level):
+        super().__init__(name='Eevee', type='Normal', moves=[Tackle,Growl], level=level, atk = 40, dfc = 40, hp=40)
+class Player:
+    def __init__(self, pokemons):
+        pass
+    def select(self, pokemons):
+        if pokemons == "Charmander":
+            self.pokemons = Charmander(level=5)
+            print("U choosed Charmander")
+        elif pokemons == "Bulbasaur":
+            self.pokemons = Bulbasaur(level=5)
+            print("U choosed Bulbasaur")
+        elif pokemons == "Squirtle":
+            self.pokemons = Squirtle(level=5)
+            print("U choosed Squirtle")
+        elif pokemons == "Pikachu":
+            self.pokemons = Pikachu(level=5)
+            print("U choosed Pikachu")
+        elif pokemons == "Eevee":
+            self.pokemons = Eevee(level=5)
+            print("U choosed Eevee")
+
+    def attack(self, enemy, move):
+        damage = int(self.pokemons.damageCalculator(enemy, move))
+        if move != "Growl" or "Tailwhip":
+            print(f"{self.pokemons} used {move} did {damage} damage")
+        elif move == "Growl":
+            print(f"{enemy.pokemons} attack decreased ")
+            enemy.atk -= 2
+        elif move == "Tailwhip":
+            print(f"{enemy.pokemons} defence decreased")
+            enemy.dfc -= 2
+
+# ... (previous code)
+
+class enemy:
+    def select(self):
+        i = random.randint(0, 4)
+        if i == 0:
+            self.pokemon = Charmander(level=1)
+        elif i == 1:
+            self.pokemon = Bulbasaur(level=1)
+        elif i == 2:
+            self.pokemon = Squirtle(level=1)
+        elif i == 3:
+            self.pokemon = Pikachu(level=1)
+        elif i == 4:
+            self.pokemon = Eevee(level=1)
+        print(f"a wild {self.pokemon.name} has appeared")
+    def attack(self, enemy, move):
+        damage = int(self.pokemons.damageCalculator(enemy, move))
+        if move != "Growl" or "Tailwhip":
+            print(f"{self.pokemons} used {move} did {damage} damage")
+        elif move == "Growl":
+            print(f"{enemy.pokemons} attack decreased ")
+            enemy.atk -= 2
+        elif move == "Tailwhip":
+            print(f"{enemy.pokemons} defence decreased")
+            enemy.dfc -= 2
+class Move(Pokemon):
+    def __init__(self,type,bp,effects,name):
+        self.type=type
+        self.name=name
+        self.bp=bp
+        self.effects=[]
+bulletseed = Move('Grass', 40, ['hplower'])
+Tackle=Move('Normal',40,['hplower'])
+Growl=Move('Normal',0,['atklower'])
+Ember = Move('Fire', bp=40, effects=['burn','hplower'])
+spark = Move('Electric', bp=40, effects=['paralyze','hplower'])
+watergun = Move('Water', bp=40, effects=['hplower'])
+earthquake = Move('Ground', bp=100, effects=['hplower'])
+Tailwhip=Move('Normal',0,['dfclower'])
+player = Player()
+team = enemy()
+game = 0
+while True:
+    if game == 0:
+        team.select()
+        game = 1
+    if game == 1:
+        n = int(input("Choose a pokemon \n1.Charmander  2.Pikachu\n3.Bulbasaur   3.Squirtle"))
+        if n == 1:
+            player.select("Charmander")
+        elif n == 2:
+            player.select("Pikachu")
+        elif n == 3:
+            player.select("Bulbasaur")
+        elif n == 4:
+            player.select("Squirtle")
+        game = 2
+    if player.pokemons.hp <= 0:
+        print("You lost")
+        break
+    elif team.pokemon.hp <= 0:
+        print("You win")
+        break
+    if game == 2:
+        print("Select Move")
+        for i in range(len(player.pokemons.moves)):
+            print(f"{i + 1}.{player.pokemons.moves[i]}", end=" ")
+        n = int(input())
+        move = player.pokemons.moves[n - 1]
+        player.attack(team, move)
+        n = random.randint(0, len(team.pokemon.moves))
+        move = team.pokemon.moves[n]
+        team.attack(player, move)
