@@ -58,16 +58,20 @@ class Player:
 
     def attack(self, enemy, move):
         damage = int(self.pokemon.damageCalculator(enemy, move))
-        if move != "Growl" or "Tailwhip":
+        if move.name != ("Growl") and move.name != ("Tailwhip"):
             print(f"{self.pokemon.name} used {move.name} did {damage} damage")
             enemy.pokemon.hp-=damage
-            print(f" {enemy.pokemon.name} hp remaining {enemy.pokemon.hp}")
-        elif move == "Growl":
-            print(f"{enemy.pokemon.name} attack decreased ")
-            enemy.atk -= 2
-        elif move == "Tailwhip":
-            print(f"{enemy.pokemon.name} defence decreased")
-            enemy.dfc -= 2
+            if(enemy.pokemon.hp>0):
+                print(f" {enemy.pokemon.name} hp remaining {enemy.pokemon.hp}")
+            else:
+                print(f"{enemy.pokemon.name} fainted")
+                return
+        elif move.name == "Growl":
+            print(f"{self.pokemon.name} used Growl {enemy.pokemon.name} attack decreased ")
+            enemy.pokemon.atk -= 2
+        elif move.name == "Tailwhip":
+            print(f"{self.pokemon.name} used Tailwhip {enemy.pokemon.name} defence decreased")
+            enemy.pokemon.dfc -= 2
 
 # ... (previous code)
 
@@ -87,16 +91,19 @@ class enemy:
         print(f"a wild {self.pokemon.name} has appeared")
     def attack(self, enemy, move):
         damage = int(self.pokemon.damageCalculator(enemy, move))
-        if move != "Growl" or "Tailwhip":
+        if move.name != ("Growl") and move.name != ("Tailwhip"):
             print(f"{self.pokemon.name} used {move.name} did {damage} damage")
             player.pokemon.hp-=damage
-            print(f" {player.pokemon.name} hp remaining {player.pokemon.hp}")
-        elif move == "Growl":
-            print(f"{enemy.pokemon.name} attack decreased ")
-            player.atk -= 2
-        elif move == "Tailwhip":
-            print(f"{enemy.pokemon.name} defence decreased")
-            player.dfc -= 2
+            if(player.pokemon.hp>=0):
+                print(f" {player.pokemon.name} hp remaining {player.pokemon.hp}")
+            else:
+                print(f"{player.pokemon.name} fainted")
+        elif move.name == "Growl":
+            print(f"{self.pokemon.name} used Growl {player.pokemon.name} attack decreased ")
+            player.pokemon.atk -= 2
+        elif move.name == "Tailwhip":
+            print(f"{self.pokemon.name} used Tailwhip {player.pokemon.name} defence decreased")
+            player.pokemon.dfc -= 2
 class Move(Pokemon):
     def __init__(self,name,type,bp,effects):
         self.type=type
@@ -129,12 +136,6 @@ while True:
         elif n == 4:
             player.select("Squirtle")
         game = 2
-    if player.pokemon.hp <= 0:
-        print("You lost")
-        break
-    elif team.pokemon.hp <= 0:
-        print("You win")
-        break
     if game == 2:
         print("Select Move")
         for i in range(len(player.pokemon.moves)):
@@ -142,7 +143,15 @@ while True:
         print("")
         n = int(input())
         move = player.pokemon.moves[n - 1]
-        player.attack(team, move)
+        if(player.pokemon.hp>0):
+            player.attack(team, move)
+        else:
+            print('You lost')
+            break
         n = random.randint(0, len(team.pokemon.moves)-1)
-        move = team.pokemon.moves[n]
+        if(team.pokemon.hp>0):
+            move = team.pokemon.moves[n]
+        else:
+            print("You win")
+            break
         team.attack(player, move)
